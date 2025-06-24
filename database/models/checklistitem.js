@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class Checklists extends Model {
+  class ChecklistItem extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,30 +11,34 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Checklists.hasMany(models.ChecklistItem, { foreignKey: 'checklistId', as: 'items' });
+      ChecklistItem.belongsTo(models.Checklists, { foreignKey: 'checklistId', as: 'checklist' });
     }
   }
-  Checklists.init({
+  ChecklistItem.init({
     id: {
       allowNull: false,
       autoIncrement: true,
       primaryKey: true,
       type: DataTypes.INTEGER
     },
-    name: {
+    itemName: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: false
     },
-    userId: {
-      type: DataTypes.UUID,
-      allowNull: false,
+    isActive: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true
     },
+    checklistId: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    }
   }, {
     sequelize,
-    modelName: 'Checklists',
-    tableName: 'checklists',
+    modelName: 'ChecklistItem',
+    tableName: 'checklist_items',
     freezeTableName: true,
     timestamps: true
   });
-  return Checklists;
+  return ChecklistItem;
 };

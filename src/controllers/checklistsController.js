@@ -31,7 +31,27 @@ const getAll = async (req, res) => {
     }
 };
 
+const remove = async (req, res) => {
+    try {
+        const { checklistId } = req.params;
+        const userId = req.user?.id;
+
+        const deleted = await checklistService.deleteChecklist({ checklistId, userId });
+
+        if (!deleted) {
+            return res.status(404).json({ info: "Checklist not found or unauthorized" });
+        }
+
+        res.status(200).json({ info: "Checklist deleted successfully" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ info: "Internal Server Error" });
+    }
+};
+
+
 module.exports = {
     create,
-    getAll
+    getAll,
+    remove
 };
