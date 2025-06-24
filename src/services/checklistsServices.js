@@ -1,4 +1,4 @@
-const { Checklists } = require("../../database/models");
+const { Checklists, ChecklistItem } = require("../../database/models");
 
 const createChecklist = async ({ name, userId }) => {
     const checklist = await Checklists.create({ name, userId });
@@ -8,21 +8,31 @@ const createChecklist = async ({ name, userId }) => {
 const getAllChecklists = async (userId) => {
     const checklists = await Checklists.findAll({
         where: { userId },
-        order: [["createdAt", "DESC"]]
+        include: [{
+            model: ChecklistItem,
+            as: "items",
+            attributes: ["id", "itemName", "isActive", "createdAt", "updatedAt"]
+        }],
+        order: [
+            ["createdAt", "DESC"],
+            ["items", "createdAt", "DESC"]
+        ]
     });
 
     return checklists;
 };
 
 const deleteChecklist = async ({ checklistId, userId }) => {
-    const deleted = await Checklists.destroy({
-        where: {
-            id: checklistId,
-            userId
-        }
+    const checklist = await Checklists.findOne({
+        where: { id: checklistId, userId },
+        include: [{ model: ChecklistItem, as: "items" }]
     });
 
-    return deleted > 0; // returns true if deleted, false otherwise
+    if (!checklist) return false;
+
+    await checklist.destroy();
+
+    return true;
 };
 
 module.exports = {
