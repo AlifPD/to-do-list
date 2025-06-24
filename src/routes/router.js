@@ -1,16 +1,20 @@
 const express = require("express")
-const authController = require("../controllers/authController");
+const authRouter = require("./authRoutes")
+const checklistRouter = require("./checklistsRoutes")
 
 const router = express.Router()
 
-router.get("/", (req, res) => {
+// Base, for testing
+router.get("/info", (req, res) => {
     res.json({
         info: "Welcome to To Do List API"
     });
 });
 
 // AUTH
-router.post("/login", authController.login);
-router.post("/register", authController.register);
+router.use("/", authRouter);
+
+// Checklists
+router.use("/checklist", checklistRouter);
 
 module.exports = router
